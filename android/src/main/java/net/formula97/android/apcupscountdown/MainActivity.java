@@ -1,17 +1,22 @@
 package net.formula97.android.apcupscountdown;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.Fragment;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -65,6 +70,12 @@ public class MainActivity extends Activity {
         TextView tv_shutdownPeriod;
         TextView tv_shutdownPeriodInSec;
 
+        DatePickerDialog dpDialog;
+        TimePickerDialog tpDialog;
+
+        DatePickerDialog.OnDateSetListener dpListener;
+        TimePickerDialog.OnTimeSetListener tpListener;
+
         public PlaceholderFragment() {
 
         }
@@ -113,6 +124,28 @@ public class MainActivity extends Activity {
             tv_shutdownStartAt.setText(buildDateFormat(disp) + " " + disp.get(Calendar.HOUR_OF_DAY) + ":" + disp.get(Calendar.MINUTE));
             tv_shutdownPeriod.setText(String.valueOf(diffCalendarInMin(disp, delayed10)));
             tv_shutdownPeriodInSec.setText(String.valueOf(diffCalendarInSec(disp, delayed10)));
+
+            // クリックリスナーをセット
+            et_ShutdownStartDate.setOnClickListener(this);
+            et_ShutdownStartTime.setOnClickListener(this);
+            et_WakeUpDate.setOnClickListener(this);
+            et_WakeUpTime.setOnClickListener(this);
+
+            // DatePickerListenerをセット
+            dpListener = new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
+                }
+            };
+
+            // TimePickerListenerをセット
+            tpListener = new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+
+                }
+            };
         }
 
         /**
@@ -122,7 +155,16 @@ public class MainActivity extends Activity {
          */
         @Override
         public void onClick(View v) {
-
+            switch (v.getId()) {
+                case R.id.et_ShutdownStartDate:
+                    break;
+                case R.id.et_ShutdownStartTime:
+                    break;
+                case R.id.et_WakeUpDate:
+                    break;
+                case R.id.et_WakeUpTime:
+                    break;
+            }
         }
         /**
          * 画面全体の幅に対し、何分の１のサイズが適当かを返す。
@@ -175,6 +217,21 @@ public class MainActivity extends Activity {
             // 時刻をミリ秒で取得しているので、秒に直す
             return (int) ((ed - sd) / 1000);
         }
+
+        /**
+         * 端末の「日付と時刻の設定」で、時刻表記が24時間制か否かを判断する。
+         * @return boolean型、24時間制の場合はtrue、12時間制の場合はfalse
+         */
+        private boolean isSetting24hourFormat() {
+            // 12、または24をString型で返してくるため、Stringの比較で判断する。
+            String str = Settings.System.getString(
+                    getActivity().getApplicationContext().getContentResolver(),
+                    Settings.System.TIME_12_24);
+            String hours24 = "24";
+
+            return hours24.equals(str) ? true : false;
+        }
+
     }
 
 

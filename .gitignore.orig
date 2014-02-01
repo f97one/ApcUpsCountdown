@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+.gradle
+/local.properties
+/.idea/workspace.xml
+.DS_Store
+=======
 # built application files
 *.apk
 *.ap_
@@ -27,9 +33,4 @@ proguard/
 *.ipr
 *.iws
 .idea/
-
-.gradle
-/local.properties
-/.idea/workspace.xml
-.DS_Store
-
+>>>>>>> GitHub/master

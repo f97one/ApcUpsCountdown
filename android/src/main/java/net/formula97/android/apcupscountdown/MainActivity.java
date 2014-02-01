@@ -1,0 +1,181 @@
+package net.formula97.android.apcupscountdown;
+
+import android.app.Activity;
+import android.app.Fragment;
+import android.content.Context;
+import android.graphics.Point;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import java.util.Calendar;
+import java.util.Date;
+
+public class MainActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            getFragmentManager().beginTransaction()
+                    .add(R.id.container, new PlaceholderFragment())
+                    .commit();
+        }
+
+        // ViewIdの取得はPlaceholderFlagment#onCreateView()で行う。
+    }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
+
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment implements View.OnClickListener {
+
+        EditText et_ShutdownStartDate;
+        EditText et_ShutdownStartTime;
+        EditText et_WakeUpDate;
+        EditText et_WakeUpTime;
+        TextView tv_shutdownStartAt;
+        TextView tv_shutdownPeriod;
+        TextView tv_shutdownPeriodInSec;
+
+        public PlaceholderFragment() {
+
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+            // ここでウィジェット類のfindViewByIdを呼ぶ
+            et_ShutdownStartDate = (EditText) rootView.findViewById(R.id.et_ShutdownStartDate);
+            et_ShutdownStartTime = (EditText) rootView.findViewById(R.id.et_ShutdownStartTime);
+            et_WakeUpDate = (EditText) rootView.findViewById(R.id.et_WakeUpDate);
+            et_WakeUpTime = (EditText) rootView.findViewById(R.id.et_WakeUpTime);
+            tv_shutdownStartAt = (TextView) rootView.findViewById(R.id.tv_shutdownStartAt);
+            tv_shutdownPeriod = (TextView) rootView.findViewById(R.id.tv_shutdownPeriod);
+            tv_shutdownPeriodInSec = (TextView) rootView.findViewById(R.id.tv_shutdownPeriodInSec);
+
+            return rootView;
+        }
+
+        /**
+         * Called when the fragment is visible to the user and actively running.
+         * This is generally
+         * tied to {@link android.app.Activity#onResume() Activity.onResume} of the containing
+         * Activity's lifecycle.
+         */
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            et_ShutdownStartTime.setWidth(getWidgetWidth(5));
+            et_ShutdownStartDate.setWidth(getWidgetWidth(3));
+            et_WakeUpTime.setWidth(getWidgetWidth(5));
+            et_WakeUpDate.setWidth(getWidgetWidth(3));
+
+            // 現在時刻＋２分をセット
+            Calendar disp = getDelayed(2);
+            Calendar delayed10 = (Calendar) disp.clone();
+            delayed10.add(Calendar.MINUTE, 10);
+            et_ShutdownStartDate.setText(buildDateFormat(disp));
+            et_ShutdownStartTime.setText(disp.get(Calendar.HOUR_OF_DAY) + ":" + disp.get(Calendar.MINUTE));
+            et_WakeUpDate.setText(buildDateFormat(delayed10));
+            et_WakeUpTime.setText(delayed10.get(Calendar.HOUR_OF_DAY) + ":" + delayed10.get(Calendar.MINUTE));
+
+            tv_shutdownStartAt.setText(buildDateFormat(disp) + " " + disp.get(Calendar.HOUR_OF_DAY) + ":" + disp.get(Calendar.MINUTE));
+            tv_shutdownPeriod.setText(String.valueOf(diffCalendarInMin(disp, delayed10)));
+            tv_shutdownPeriodInSec.setText(String.valueOf(diffCalendarInSec(disp, delayed10)));
+        }
+
+        /**
+         * Called when a view has been clicked.
+         *
+         * @param v The view that was clicked.
+         */
+        @Override
+        public void onClick(View v) {
+
+        }
+        /**
+         * 画面全体の幅に対し、何分の１のサイズが適当かを返す。
+         * @param divisionNumber int型、画面の何分の1にしたいかを指定する。（1/3の場合は3）
+         * @return int型、画面全体に対する指定分割数の横幅
+         */
+        private int getWidgetWidth(int divisionNumber) {
+            Display display = getActivity().getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int ret = (int)Math.floor(size.x / divisionNumber);
+
+            Log.d("getWidgetWidth", "Overall width = " + String.valueOf(size.x));
+            Log.d("getWidgetWidth", "returned width = " + String.valueOf(ret));
+
+            return ret;
+        }
+
+        public Calendar getDelayed(int delayedMinute) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MINUTE, delayedMinute);
+
+            return calendar;
+        }
+
+        /**
+         * editTextに日付をセットする。フォーマットはロケール設定に従う。
+         * @param gcd Calendar型、指定日付にセットされたCalendarオブジェクト
+         * @return String型、ロケールに沿った日付フォーマットの文字列
+         */
+        private String buildDateFormat(Calendar gcd) {
+            Date dd = gcd.getTime();
+
+            // AndroidのAPIに定義されているDateFormatでロケールを読み出し、
+            // java.text.DateFormatに書き出す。
+            Context ctx = getActivity().getApplicationContext();
+            java.text.DateFormat df = android.text.format.DateFormat.getDateFormat(ctx);
+            return df.format(dd);
+        }
+
+        private int diffCalendarInMin(Calendar startDate, Calendar endDate) {
+            return (int) (diffCalendarInSec(startDate, endDate) / 60);
+        }
+
+        private int diffCalendarInSec(Calendar startDate, Calendar endDate) {
+
+            long sd = startDate.getTimeInMillis();
+            long ed = endDate.getTimeInMillis();
+
+            // 時刻をミリ秒で取得しているので、秒に直す
+            return (int) ((ed - sd) / 1000);
+        }
+    }
+
+
+}

@@ -62,10 +62,10 @@ public class MainActivity extends Activity {
      */
     public static class PlaceholderFragment extends Fragment implements View.OnClickListener {
 
-        EditText et_ShutdownStartDate;
-        EditText et_ShutdownStartTime;
-        EditText et_WakeUpDate;
-        EditText et_WakeUpTime;
+        TextView et_ShutdownStartDate;
+        TextView et_ShutdownStartTime;
+        TextView et_WakeUpDate;
+        TextView et_WakeUpTime;
         TextView tv_shutdownStartAt;
         TextView tv_shutdownPeriod;
         TextView tv_shutdownPeriodInSec;
@@ -105,10 +105,10 @@ public class MainActivity extends Activity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             // ここでウィジェット類のfindViewByIdを呼ぶ
-            et_ShutdownStartDate = (EditText) rootView.findViewById(R.id.et_ShutdownStartDate);
-            et_ShutdownStartTime = (EditText) rootView.findViewById(R.id.et_ShutdownStartTime);
-            et_WakeUpDate = (EditText) rootView.findViewById(R.id.et_WakeUpDate);
-            et_WakeUpTime = (EditText) rootView.findViewById(R.id.et_WakeUpTime);
+            et_ShutdownStartDate = (TextView) rootView.findViewById(R.id.et_ShutdownStartDate);
+            et_ShutdownStartTime = (TextView) rootView.findViewById(R.id.et_ShutdownStartTime);
+            et_WakeUpDate = (TextView) rootView.findViewById(R.id.et_WakeUpDate);
+            et_WakeUpTime = (TextView) rootView.findViewById(R.id.et_WakeUpTime);
             tv_shutdownStartAt = (TextView) rootView.findViewById(R.id.tv_shutdownStartAt);
             tv_shutdownPeriod = (TextView) rootView.findViewById(R.id.tv_shutdownPeriod);
             tv_shutdownPeriodInSec = (TextView) rootView.findViewById(R.id.tv_shutdownPeriodInSec);
@@ -165,6 +165,11 @@ public class MainActivity extends Activity {
 
                             end = (Calendar) start.clone();
                             et_WakeUpDate.setText(buildDateFormat(end));
+                            break;
+                        case R.id.et_WakeUpDate:
+                            end.set(year, monthOfYear, dayOfMonth);
+                            et_WakeUpDate.setText(buildDateFormat(end));
+                            break;
                     }
                 }
             };

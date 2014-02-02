@@ -76,6 +76,25 @@ public class MainActivity extends Activity {
         DatePickerDialog.OnDateSetListener dpListener;
         TimePickerDialog.OnTimeSetListener tpListener;
 
+        Calendar start;
+
+        public Calendar getStart() {
+            if (start != null) start.clear();
+            start = Calendar.getInstance();
+            return start;
+        }
+
+        public Calendar getEnd() {
+            if (start != null) {
+                end = (Calendar) start.clone();
+            } else {
+                end = Calendar.getInstance();
+            }
+            return end;
+        }
+
+        Calendar end;
+
         public PlaceholderFragment() {
 
         }
@@ -116,6 +135,10 @@ public class MainActivity extends Activity {
             Calendar disp = getDelayed(2);
             Calendar delayed10 = (Calendar) disp.clone();
             delayed10.add(Calendar.MINUTE, 10);
+
+            start = (Calendar) disp.clone();
+            end = (Calendar) delayed10.clone();
+
             et_ShutdownStartDate.setText(buildDateFormat(disp));
             et_ShutdownStartTime.setText(disp.get(Calendar.HOUR_OF_DAY) + ":" + disp.get(Calendar.MINUTE));
             et_WakeUpDate.setText(buildDateFormat(delayed10));
@@ -135,7 +158,14 @@ public class MainActivity extends Activity {
             dpListener = new DatePickerDialog.OnDateSetListener() {
                 @Override
                 public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    switch(view.getId()) {
+                        case R.id.et_ShutdownStartDate:
+                            start.set(year, monthOfYear, dayOfMonth);
+                            et_ShutdownStartDate.setText(buildDateFormat(start));
 
+                            end = (Calendar) start.clone();
+                            et_WakeUpDate.setText(buildDateFormat(end));
+                    }
                 }
             };
 
@@ -155,17 +185,35 @@ public class MainActivity extends Activity {
          */
         @Override
         public void onClick(View v) {
+
+            Context context = getActivity();
+
             switch (v.getId()) {
                 case R.id.et_ShutdownStartDate:
+                    showDpDialog(context, getStart());
+
                     break;
                 case R.id.et_ShutdownStartTime:
                     break;
                 case R.id.et_WakeUpDate:
+                    showDpDialog(context, getEnd());
+
                     break;
                 case R.id.et_WakeUpTime:
                     break;
             }
         }
+
+        private void showDpDialog(Context context, Calendar calendar) {
+            // 年、月、日をそれぞれ取得する
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+            dpDialog = new DatePickerDialog(context, dpListener, year, month, dayOfMonth);
+            dpDialog.show();
+        }
+
         /**
          * 画面全体の幅に対し、何分の１のサイズが適当かを返す。
          * @param divisionNumber int型、画面の何分の1にしたいかを指定する。（1/3の場合は3）

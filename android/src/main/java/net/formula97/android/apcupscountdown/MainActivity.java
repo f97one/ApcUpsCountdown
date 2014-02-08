@@ -1,11 +1,13 @@
 package net.formula97.android.apcupscountdown;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -14,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -23,6 +24,7 @@ import java.util.Date;
 
 public class MainActivity extends Activity {
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,26 +79,13 @@ public class MainActivity extends Activity {
         TimePickerDialog.OnTimeSetListener tpListener;
 
         Calendar start;
-
-        public Calendar getStart() {
-            if (start != null) start.clear();
-            start = Calendar.getInstance();
-            return start;
-        }
-
-        public Calendar getEnd() {
-            if (start != null) {
-                end = (Calendar) start.clone();
-            } else {
-                end = Calendar.getInstance();
-            }
-            return end;
-        }
-
         Calendar end;
 
         public PlaceholderFragment() {
-
+            // 時刻を初期化する
+            start = Calendar.getInstance();
+            end = Calendar.getInstance();
+            end.add(Calendar.MINUTE, 10);
         }
 
         @Override
@@ -126,27 +115,25 @@ public class MainActivity extends Activity {
         public void onResume() {
             super.onResume();
 
-            et_ShutdownStartTime.setWidth(getWidgetWidth(5));
+            // ウィジェットの表示幅を調整する
+            et_ShutdownStartTime.setWidth(getWidgetWidth(4));
             et_ShutdownStartDate.setWidth(getWidgetWidth(3));
-            et_WakeUpTime.setWidth(getWidgetWidth(5));
+            et_WakeUpTime.setWidth(getWidgetWidth(4));
             et_WakeUpDate.setWidth(getWidgetWidth(3));
 
             // 現在時刻＋２分をセット
-            Calendar disp = getDelayed(2);
-            Calendar delayed10 = (Calendar) disp.clone();
-            delayed10.add(Calendar.MINUTE, 10);
+            start.set(Calendar.MINUTE, 2);
+            cloneToEnd();
 
-            start = (Calendar) disp.clone();
-            end = (Calendar) delayed10.clone();
+            et_ShutdownStartDate.setText(buildDateFormat(start));
+            et_ShutdownStartTime.setText(buildTimeFormat(start));
+            et_WakeUpDate.setText(buildDateFormat(end));
+            et_WakeUpTime.setText(buildTimeFormat(end));
 
-            et_ShutdownStartDate.setText(buildDateFormat(disp));
-            et_ShutdownStartTime.setText(disp.get(Calendar.HOUR_OF_DAY) + ":" + disp.get(Calendar.MINUTE));
-            et_WakeUpDate.setText(buildDateFormat(delayed10));
-            et_WakeUpTime.setText(delayed10.get(Calendar.HOUR_OF_DAY) + ":" + delayed10.get(Calendar.MINUTE));
-
-            tv_shutdownStartAt.setText(buildDateFormat(disp) + " " + disp.get(Calendar.HOUR_OF_DAY) + ":" + disp.get(Calendar.MINUTE));
-            tv_shutdownPeriod.setText(String.valueOf(diffCalendarInMin(disp, delayed10)));
-            tv_shutdownPeriodInSec.setText(String.valueOf(diffCalendarInSec(disp, delayed10)));
+            // PowerChute(R)の時刻表記は、あえて24時間制にする
+            tv_shutdownStartAt.setText(buildDateFormat(start) + " " + start.get(Calendar.HOUR_OF_DAY) + ":" + start.get(Calendar.MINUTE));
+            tv_shutdownPeriod.setText(String.valueOf(diffCalendarInMin(start, end)));
+            tv_shutdownPeriodInSec.setText(String.valueOf(diffCalendarInSec(start, end)));
 
             // クリックリスナーをセット
             et_ShutdownStartDate.setOnClickListener(this);
@@ -163,7 +150,7 @@ public class MainActivity extends Activity {
                             start.set(year, monthOfYear, dayOfMonth);
                             et_ShutdownStartDate.setText(buildDateFormat(start));
 
-                            end = (Calendar) start.clone();
+                            cloneToEnd();
                             et_WakeUpDate.setText(buildDateFormat(end));
                             break;
                         case R.id.et_WakeUpDate:
@@ -178,9 +165,33 @@ public class MainActivity extends Activity {
             tpListener = new TimePickerDialog.OnTimeSetListener() {
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    switch(view.getId()) {
+                        case R.id.et_ShutdownStartTime:
+                            // シャットダウン開始時刻の修正処理
+                            start.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                            start.set(Calendar.MINUTE, minute);
+                            start.set(Calendar.SECOND, 0);
 
+                            cloneToEnd();
+                            et_ShutdownStartTime.setText(buildTimeFormat(start));
+                            break;
+                        case R.id.et_WakeUpTime:
+                            // 起動時刻の修正処理
+                            //end.set(Calendar.HOUR_OF_DAY, hourOfDay);
+
+
+                            break;
+                    }
                 }
             };
+        }
+
+        /**
+         * endフィールドにstartフィールドの時刻をcloneし、時刻を10分進める。
+         */
+        private void cloneToEnd() {
+            end = (Calendar) start.clone();
+            end.add(Calendar.MINUTE, 10);
         }
 
         /**
@@ -195,13 +206,13 @@ public class MainActivity extends Activity {
 
             switch (v.getId()) {
                 case R.id.et_ShutdownStartDate:
-                    showDpDialog(context, getStart());
-
+                    showDpDialog(context, start);
                     break;
                 case R.id.et_ShutdownStartTime:
+                    showTpDialog(context, start);
                     break;
                 case R.id.et_WakeUpDate:
-                    showDpDialog(context, getEnd());
+                    showDpDialog(context, end);
 
                     break;
                 case R.id.et_WakeUpTime:
@@ -209,6 +220,11 @@ public class MainActivity extends Activity {
             }
         }
 
+        /**
+         * DatePickerDialogを表示する。
+         * @param context context型、表示するアプリケーションコンテクスト
+         * @param calendar Calendar型、表示の際に引き渡すCalendar
+         */
         private void showDpDialog(Context context, Calendar calendar) {
             // 年、月、日をそれぞれ取得する
             int year = calendar.get(Calendar.YEAR);
@@ -217,6 +233,19 @@ public class MainActivity extends Activity {
 
             dpDialog = new DatePickerDialog(context, dpListener, year, month, dayOfMonth);
             dpDialog.show();
+        }
+
+        /**
+         * TimePickerDialogを表示する。
+         * @param context context型、表示するアプリケーションコンテクスト
+         * @param calendar Calendar型、表示の際に引き渡すCalendar
+         */
+        private void showTpDialog(Context context, Calendar calendar) {
+            int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+
+            tpDialog = new TimePickerDialog(context, tpListener, hourOfDay, minute, isSetting24hourFormat());
+            tpDialog.show();
         }
 
         /**
@@ -236,13 +265,6 @@ public class MainActivity extends Activity {
             return ret;
         }
 
-        public Calendar getDelayed(int delayedMinute) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MINUTE, delayedMinute);
-
-            return calendar;
-        }
-
         /**
          * editTextに日付をセットする。フォーマットはロケール設定に従う。
          * @param gcd Calendar型、指定日付にセットされたCalendarオブジェクト
@@ -258,10 +280,34 @@ public class MainActivity extends Activity {
             return df.format(dd);
         }
 
+        /**
+         * 端末設定に従い、フォーマット済みの時刻文字列を返す。
+         * @param gcd Calendar型、表示するCalendar
+         * @return String型、フォーマット済みの時刻文字列
+         */
+        private String buildTimeFormat(Calendar gcd) {
+            Date dd = gcd.getTime();
+            Context ctx = getActivity().getApplicationContext();
+            java.text.DateFormat df = android.text.format.DateFormat.getTimeFormat(ctx);
+            return df.format(dd);
+        }
+
+        /**
+         * 開始から終了までの時間差を分で返す。
+         * @param startDate Calendar型、開始時刻
+         * @param endDate Calendar型、終了時刻
+         * @return int型、開始から終了までの時間差（単位：分）
+         */
         private int diffCalendarInMin(Calendar startDate, Calendar endDate) {
             return (int) (diffCalendarInSec(startDate, endDate) / 60);
         }
 
+        /**
+         * 開始から終了までの時間差を秒で返す。
+         * @param startDate Calendar型、開始時刻
+         * @param endDate Calendar型、終了時刻
+         * @return int型、開始から終了までの時間差（単位：秒）
+         */
         private int diffCalendarInSec(Calendar startDate, Calendar endDate) {
 
             long sd = startDate.getTimeInMillis();
@@ -272,7 +318,7 @@ public class MainActivity extends Activity {
         }
 
         /**
-         * 端末の「日付と時刻の設定」で、時刻表記が24時間制か否かを判断する。
+         * 端末の「日付と時刻の設定」で、時刻表記が24時間制にセットされているか否かを判断する。
          * @return boolean型、24時間制の場合はtrue、12時間制の場合はfalse
          */
         private boolean isSetting24hourFormat() {
@@ -282,10 +328,7 @@ public class MainActivity extends Activity {
                     Settings.System.TIME_12_24);
             String hours24 = "24";
 
-            return hours24.equals(str) ? true : false;
+            return hours24.equals(str);
         }
-
     }
-
-
 }

@@ -122,7 +122,7 @@ public class MainActivity extends Activity {
             et_WakeUpDate.setWidth(getWidgetWidth(3));
 
             // 現在時刻＋２分をセット
-            start.set(Calendar.MINUTE, 2);
+            start.add(Calendar.MINUTE, 2);
             cloneToEnd();
 
             et_ShutdownStartDate.setText(buildDateFormat(start));
@@ -130,10 +130,7 @@ public class MainActivity extends Activity {
             et_WakeUpDate.setText(buildDateFormat(end));
             et_WakeUpTime.setText(buildTimeFormat(end));
 
-            // PowerChute(R)の時刻表記は、あえて24時間制にする
-            tv_shutdownStartAt.setText(buildDateFormat(start) + " " + start.get(Calendar.HOUR_OF_DAY) + ":" + start.get(Calendar.MINUTE));
-            tv_shutdownPeriod.setText(String.valueOf(diffCalendarInMin(start, end)));
-            tv_shutdownPeriodInSec.setText(String.valueOf(diffCalendarInSec(start, end)));
+            setResultTime();
 
             // クリックリスナーをセット
             et_ShutdownStartDate.setOnClickListener(this);
@@ -145,10 +142,12 @@ public class MainActivity extends Activity {
             dpListener = new DatePickerDialog.OnDateSetListener() {
                 @Override
                 public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    Log.d("OnDateSetListener", "entered OnDateSetListener.");
                     switch(view.getId()) {
                         case R.id.et_ShutdownStartDate:
                             start.set(year, monthOfYear, dayOfMonth);
                             et_ShutdownStartDate.setText(buildDateFormat(start));
+                            Log.d("OnDateSetListener", "accepted date : " + buildDateFormat(start) + " " + buildTimeFormat(start));
 
                             cloneToEnd();
                             et_WakeUpDate.setText(buildDateFormat(end));
@@ -156,8 +155,13 @@ public class MainActivity extends Activity {
                         case R.id.et_WakeUpDate:
                             end.set(year, monthOfYear, dayOfMonth);
                             et_WakeUpDate.setText(buildDateFormat(end));
+                            Log.d("OnDateSetListener", "accepted date : " + buildDateFormat(end) + " " + buildTimeFormat(end));
+                            break;
+                        default:
+                            Log.d("OnDateSetListener", "nothing to do.");
                             break;
                     }
+                    setResultTime();
                 }
             };
 
@@ -165,6 +169,7 @@ public class MainActivity extends Activity {
             tpListener = new TimePickerDialog.OnTimeSetListener() {
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    Log.d("OnTimeSetListener", "entered OnTimeSetListener.");
                     switch(view.getId()) {
                         case R.id.et_ShutdownStartTime:
                             // シャットダウン開始時刻の修正処理
@@ -177,13 +182,22 @@ public class MainActivity extends Activity {
                             break;
                         case R.id.et_WakeUpTime:
                             // 起動時刻の修正処理
-                            //end.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                            end.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                            end.set(Calendar.MINUTE, minute);
+                            end.set(Calendar.SECOND, 0);
 
-
+                            et_ShutdownStartTime.setText(buildTimeFormat(end));
                             break;
                     }
+                    setResultTime();
                 }
             };
+        }
+
+        private void setResultTime() {
+            tv_shutdownStartAt.setText(buildDateFormat(start) + " " + buildTimeFormat(start));
+            tv_shutdownPeriod.setText(String.valueOf(diffCalendarInMin(start, end)));
+            tv_shutdownPeriodInSec.setText(String.valueOf(diffCalendarInSec(start, end)));
         }
 
         /**
@@ -213,9 +227,9 @@ public class MainActivity extends Activity {
                     break;
                 case R.id.et_WakeUpDate:
                     showDpDialog(context, end);
-
                     break;
                 case R.id.et_WakeUpTime:
+                    showTpDialog(context, end);
                     break;
             }
         }

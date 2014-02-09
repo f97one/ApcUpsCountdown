@@ -75,8 +75,10 @@ public class MainActivity extends Activity {
         DatePickerDialog dpDialog;
         TimePickerDialog tpDialog;
 
-        DatePickerDialog.OnDateSetListener dpListener;
-        TimePickerDialog.OnTimeSetListener tpListener;
+        DatePickerDialog.OnDateSetListener dpListenerStart;
+        DatePickerDialog.OnDateSetListener dpListenerEnd;
+        TimePickerDialog.OnTimeSetListener tpListenerStart;
+        TimePickerDialog.OnTimeSetListener tpListenerEnd;
 
         Calendar start;
         Calendar end;
@@ -139,56 +141,55 @@ public class MainActivity extends Activity {
             et_WakeUpTime.setOnClickListener(this);
 
             // DatePickerListenerをセット
-            dpListener = new DatePickerDialog.OnDateSetListener() {
+            dpListenerStart = new DatePickerDialog.OnDateSetListener() {
                 @Override
                 public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                     Log.d("OnDateSetListener", "entered OnDateSetListener.");
-                    switch(view.getId()) {
-                        case R.id.et_ShutdownStartDate:
-                            start.set(year, monthOfYear, dayOfMonth);
-                            et_ShutdownStartDate.setText(buildDateFormat(start));
-                            Log.d("OnDateSetListener", "accepted date : " + buildDateFormat(start) + " " + buildTimeFormat(start));
+                    start.set(year, monthOfYear, dayOfMonth);
+                    et_ShutdownStartDate.setText(buildDateFormat(start));
+                    Log.d("OnDateSetListener", "accepted date : " + buildDateFormat(start) + " " + buildTimeFormat(start));
 
-                            cloneToEnd();
-                            et_WakeUpDate.setText(buildDateFormat(end));
-                            break;
-                        case R.id.et_WakeUpDate:
-                            end.set(year, monthOfYear, dayOfMonth);
-                            et_WakeUpDate.setText(buildDateFormat(end));
-                            Log.d("OnDateSetListener", "accepted date : " + buildDateFormat(end) + " " + buildTimeFormat(end));
-                            break;
-                        default:
-                            Log.d("OnDateSetListener", "nothing to do.");
-                            break;
-                    }
+                    cloneToEnd();
+                    et_WakeUpDate.setText(buildDateFormat(end));
+                    setResultTime();
+                }
+            };
+            dpListenerEnd = new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    Log.d("OnDateSetListener", "entered OnDateSetListener.");
+                    end.set(year, monthOfYear, dayOfMonth);
+                    et_WakeUpDate.setText(buildDateFormat(end));
+                    Log.d("OnDateSetListener", "accepted date : " + buildDateFormat(end) + " " + buildTimeFormat(end));
                     setResultTime();
                 }
             };
 
             // TimePickerListenerをセット
-            tpListener = new TimePickerDialog.OnTimeSetListener() {
+            tpListenerStart = new TimePickerDialog.OnTimeSetListener() {
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                     Log.d("OnTimeSetListener", "entered OnTimeSetListener.");
-                    switch(view.getId()) {
-                        case R.id.et_ShutdownStartTime:
-                            // シャットダウン開始時刻の修正処理
-                            start.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                            start.set(Calendar.MINUTE, minute);
-                            start.set(Calendar.SECOND, 0);
+                    // シャットダウン開始時刻の修正処理
+                    start.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    start.set(Calendar.MINUTE, minute);
+                    start.set(Calendar.SECOND, 0);
 
-                            cloneToEnd();
-                            et_ShutdownStartTime.setText(buildTimeFormat(start));
-                            break;
-                        case R.id.et_WakeUpTime:
-                            // 起動時刻の修正処理
-                            end.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                            end.set(Calendar.MINUTE, minute);
-                            end.set(Calendar.SECOND, 0);
+                    cloneToEnd();
+                    et_ShutdownStartTime.setText(buildTimeFormat(start));
+                    setResultTime();
+                }
+            };
+            tpListenerEnd = new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    Log.d("OnTimeSetListener", "entered OnTimeSetListener.");
+                    // 起動時刻の修正処理
+                    end.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    end.set(Calendar.MINUTE, minute);
+                    end.set(Calendar.SECOND, 0);
 
-                            et_ShutdownStartTime.setText(buildTimeFormat(end));
-                            break;
-                    }
+                    et_ShutdownStartTime.setText(buildTimeFormat(end));
                     setResultTime();
                 }
             };
@@ -220,16 +221,16 @@ public class MainActivity extends Activity {
 
             switch (v.getId()) {
                 case R.id.et_ShutdownStartDate:
-                    showDpDialog(context, start);
+                    showDpDialog(context, start, true);
                     break;
                 case R.id.et_ShutdownStartTime:
-                    showTpDialog(context, start);
+                    showTpDialog(context, start, true);
                     break;
                 case R.id.et_WakeUpDate:
-                    showDpDialog(context, end);
+                    showDpDialog(context, end, false);
                     break;
                 case R.id.et_WakeUpTime:
-                    showTpDialog(context, end);
+                    showTpDialog(context, end, false);
                     break;
             }
         }
@@ -238,14 +239,19 @@ public class MainActivity extends Activity {
          * DatePickerDialogを表示する。
          * @param context context型、表示するアプリケーションコンテクスト
          * @param calendar Calendar型、表示の際に引き渡すCalendar
+         * @param isStart boolean型、trueなら開始日の、falseなら終了日のリスナーをコール
          */
-        private void showDpDialog(Context context, Calendar calendar) {
+        private void showDpDialog(Context context, Calendar calendar, boolean isStart) {
             // 年、月、日をそれぞれ取得する
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
             int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
-            dpDialog = new DatePickerDialog(context, dpListener, year, month, dayOfMonth);
+            if (isStart) {
+                dpDialog = new DatePickerDialog(context, dpListenerStart, year, month, dayOfMonth);
+            } else {
+                dpDialog = new DatePickerDialog(context, dpListenerEnd, year, month, dayOfMonth);
+            }
             dpDialog.show();
         }
 
@@ -253,12 +259,17 @@ public class MainActivity extends Activity {
          * TimePickerDialogを表示する。
          * @param context context型、表示するアプリケーションコンテクスト
          * @param calendar Calendar型、表示の際に引き渡すCalendar
+         * @param isStart boolean型、trueなら開始時刻の、falseなら終了時刻のリスナーをコール
          */
-        private void showTpDialog(Context context, Calendar calendar) {
+        private void showTpDialog(Context context, Calendar calendar, boolean isStart) {
             int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
             int minute = calendar.get(Calendar.MINUTE);
 
-            tpDialog = new TimePickerDialog(context, tpListener, hourOfDay, minute, isSetting24hourFormat());
+            if (isStart) {
+                tpDialog = new TimePickerDialog(context, tpListenerStart, hourOfDay, minute, isSetting24hourFormat());
+            } else {
+                tpDialog = new TimePickerDialog(context, tpListenerEnd, hourOfDay, minute, isSetting24hourFormat());
+            }
             tpDialog.show();
         }
 

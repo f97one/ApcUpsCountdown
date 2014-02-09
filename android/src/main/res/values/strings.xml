@@ -10,5 +10,8 @@
     <string name="shutdown_period">Period : </string>
     <string name="show_in_lcd">Show in LCD</string>
     <string name="seconds">sec.</string>
+    <string name="minute">min.</string>
+    <string name="hour">hour </string>
+    <string name="days">day(s) </string>
 
 </resources>

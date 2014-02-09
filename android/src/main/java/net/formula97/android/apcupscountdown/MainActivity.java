@@ -195,9 +195,14 @@ public class MainActivity extends Activity {
             };
         }
 
+        /**
+         *
+         */
         private void setResultTime() {
+            DateDeltas deltas = new DateDeltas(getActivity());
+
             tv_shutdownStartAt.setText(buildDateFormat(start) + " " + buildTimeFormat(start));
-            tv_shutdownPeriod.setText(String.valueOf(diffCalendarInMin(start, end)));
+            tv_shutdownPeriod.setText(deltas.getDeltas(start, end));
             tv_shutdownPeriodInSec.setText(String.valueOf(diffCalendarInSec(start, end)));
         }
 

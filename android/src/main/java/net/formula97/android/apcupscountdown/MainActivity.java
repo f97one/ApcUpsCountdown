@@ -118,9 +118,9 @@ public class MainActivity extends Activity {
             super.onResume();
 
             // ウィジェットの表示幅を調整する
-            et_ShutdownStartTime.setWidth(getWidgetWidth(4));
+            et_ShutdownStartTime.setWidth(getWidgetWidth(3));
             et_ShutdownStartDate.setWidth(getWidgetWidth(3));
-            et_WakeUpTime.setWidth(getWidgetWidth(4));
+            et_WakeUpTime.setWidth(getWidgetWidth(3));
             et_WakeUpDate.setWidth(getWidgetWidth(3));
 
             // 現在時刻＋２分をセット
@@ -174,9 +174,11 @@ public class MainActivity extends Activity {
                     start.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     start.set(Calendar.MINUTE, minute);
                     start.set(Calendar.SECOND, 0);
+                    et_ShutdownStartTime.setText(buildTimeFormat(start));
 
                     cloneToEnd();
-                    et_ShutdownStartTime.setText(buildTimeFormat(start));
+                    et_WakeUpDate.setText(buildDateFormat(end));
+                    et_WakeUpTime.setText(buildTimeFormat(end));
                     setResultTime();
                 }
             };

@@ -189,7 +189,7 @@ public class MainActivity extends Activity {
                     end.set(Calendar.MINUTE, minute);
                     end.set(Calendar.SECOND, 0);
 
-                    et_ShutdownStartTime.setText(buildTimeFormat(end));
+                    et_WakeUpTime.setText(buildTimeFormat(end));
                     setResultTime();
                 }
             };
@@ -320,16 +320,6 @@ public class MainActivity extends Activity {
             Context ctx = getActivity().getApplicationContext();
             java.text.DateFormat df = android.text.format.DateFormat.getTimeFormat(ctx);
             return df.format(dd);
-        }
-
-        /**
-         * 開始から終了までの時間差を分で返す。
-         * @param startDate Calendar型、開始時刻
-         * @param endDate Calendar型、終了時刻
-         * @return int型、開始から終了までの時間差（単位：分）
-         */
-        private int diffCalendarInMin(Calendar startDate, Calendar endDate) {
-            return (int) (diffCalendarInSec(startDate, endDate) / 60);
         }
 
         /**

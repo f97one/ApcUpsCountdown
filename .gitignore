@@ -33,3 +33,9 @@ proguard/
 /.idea/workspace.xml
 .DS_Store
 
+# Windows specific resource files
+Thumbs.db
+
+# keystore files for Android SDK
+debug.keystore
+formula97_net_keystore

@@ -17,11 +17,10 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:inputType="time"
         android:ems="10"
         android:id="@+id/et_ShutdownStartTime"
         android:layout_below="@+id/textView"
@@ -29,11 +28,10 @@
         android:layout_alignParentEnd="true"
         android:gravity="center_vertical|center_horizontal" />
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:inputType="date"
         android:ems="10"
         android:id="@+id/et_ShutdownStartDate"
         android:layout_below="@+id/textView"
@@ -49,11 +47,10 @@
         android:layout_alignParentStart="true"
         android:text="@string/wakeup_at" />
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:inputType="date"
         android:ems="10"
         android:id="@+id/et_WakeUpDate"
         android:layout_below="@+id/textView2"
@@ -61,11 +58,10 @@
         android:layout_alignEnd="@+id/et_ShutdownStartDate"
         android:gravity="center_vertical|center_horizontal" />
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:inputType="date"
         android:ems="10"
         android:id="@+id/et_WakeUpTime"
         android:layout_alignTop="@+id/et_WakeUpDate"

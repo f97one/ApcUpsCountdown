@@ -15,6 +15,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -64,10 +65,10 @@ public class MainActivity extends Activity {
      */
     public static class PlaceholderFragment extends Fragment implements View.OnClickListener {
 
-        TextView et_ShutdownStartDate;
-        TextView et_ShutdownStartTime;
-        TextView et_WakeUpDate;
-        TextView et_WakeUpTime;
+        Button et_ShutdownStartDate;
+        Button et_ShutdownStartTime;
+        Button et_WakeUpDate;
+        Button et_WakeUpTime;
         TextView tv_shutdownStartAt;
         TextView tv_shutdownPeriod;
         TextView tv_shutdownPeriodInSec;
@@ -96,10 +97,10 @@ public class MainActivity extends Activity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             // ここでウィジェット類のfindViewByIdを呼ぶ
-            et_ShutdownStartDate = (TextView) rootView.findViewById(R.id.et_ShutdownStartDate);
-            et_ShutdownStartTime = (TextView) rootView.findViewById(R.id.et_ShutdownStartTime);
-            et_WakeUpDate = (TextView) rootView.findViewById(R.id.et_WakeUpDate);
-            et_WakeUpTime = (TextView) rootView.findViewById(R.id.et_WakeUpTime);
+            et_ShutdownStartDate = (Button) rootView.findViewById(R.id.et_ShutdownStartDate);
+            et_ShutdownStartTime = (Button) rootView.findViewById(R.id.et_ShutdownStartTime);
+            et_WakeUpDate = (Button) rootView.findViewById(R.id.et_WakeUpDate);
+            et_WakeUpTime = (Button) rootView.findViewById(R.id.et_WakeUpTime);
             tv_shutdownStartAt = (TextView) rootView.findViewById(R.id.tv_shutdownStartAt);
             tv_shutdownPeriod = (TextView) rootView.findViewById(R.id.tv_shutdownPeriod);
             tv_shutdownPeriodInSec = (TextView) rootView.findViewById(R.id.tv_shutdownPeriodInSec);
@@ -119,9 +120,9 @@ public class MainActivity extends Activity {
 
             // ウィジェットの表示幅を調整する
             et_ShutdownStartTime.setWidth(getWidgetWidth(3));
-            et_ShutdownStartDate.setWidth(getWidgetWidth(3));
+            et_ShutdownStartDate.setWidth(getWidgetWidth(2));
             et_WakeUpTime.setWidth(getWidgetWidth(3));
-            et_WakeUpDate.setWidth(getWidgetWidth(3));
+            et_WakeUpDate.setWidth(getWidgetWidth(2));
 
             // 現在時刻＋２分をセット
             start.add(Calendar.MINUTE, 2);

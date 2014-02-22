@@ -16,4 +16,6 @@
     <string name="months">month(s) </string>
     <string name="years">year(s) </string>
 
+    <integer name="google_play_services_version">15</integer>
+
 </resources>

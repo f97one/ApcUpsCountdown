@@ -20,6 +20,8 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.gms.ads.*;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -104,6 +106,11 @@ public class MainActivity extends Activity {
             tv_shutdownStartAt = (TextView) rootView.findViewById(R.id.tv_shutdownStartAt);
             tv_shutdownPeriod = (TextView) rootView.findViewById(R.id.tv_shutdownPeriod);
             tv_shutdownPeriodInSec = (TextView) rootView.findViewById(R.id.tv_shutdownPeriodInSec);
+
+            // AdMobのロード
+            AdView adView = (AdView)rootView.findViewById(R.id.adView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adView.loadAd(adRequest);
 
             return rootView;
         }

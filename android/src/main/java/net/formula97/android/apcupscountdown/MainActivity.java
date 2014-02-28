@@ -2,21 +2,27 @@ package net.formula97.android.apcupscountdown;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -42,25 +48,57 @@ public class MainActivity extends Activity {
         // ViewIdの取得はPlaceholderFlagment#onCreateView()で行う。
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.expected_wakeup_time) {
+            alertEditTextKeyboardShown();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void alertEditTextKeyboardShown() {
+        // EditTextをつくり、数字属性にする
+        final EditText editText = new EditText(MainActivity.this);
+        editText.setRawInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.expected_wakeup)
+                .setMessage(R.string.now_showing_lcd)
+                .setView(editText)
+                .setCancelable(false)
+
+                .setPositiveButton(R.string.calculate, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d("PositiveButton", "Entered value of editText : " + editText.getText().toString());
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .create();
+
+        // EditTextのインスタンスにフォーカスが当たったら、即座にキーボードを表示させる
+
+
+        dialog.show();
+    }
 
     /**
      * A placeholder fragment containing a simple view.

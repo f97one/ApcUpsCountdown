@@ -73,6 +73,7 @@ public class MainActivity extends Activity {
         // EditTextをつくり、数字属性にする
         final EditText editText = new EditText(MainActivity.this);
         editText.setRawInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        editText.setMaxLines(1);
 
         final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.expected_wakeup)
@@ -89,7 +90,7 @@ public class MainActivity extends Activity {
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        Log.d("NegativeButton", "pressed negative button.");
                     }
                 })
                 .create();
@@ -100,6 +101,11 @@ public class MainActivity extends Activity {
         dialog.show();
     }
 
+    public void showEstimated(int remainsInSec) {
+        DateDeltas deltas = new DateDeltas(this);
+        Calendar estimated = deltas.getEstimated(remainsInSec);
+
+    }
     /**
      * A placeholder fragment containing a simple view.
      */

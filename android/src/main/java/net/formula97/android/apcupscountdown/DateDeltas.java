@@ -16,6 +16,12 @@ public class DateDeltas {
         this.ctx = context;
     }
 
+    /**
+     * 開始終了時刻の差を文字列で返す。
+     * @param from Calendar型、開始時刻
+     * @param to Calendar型、終了時刻
+     * @return String型、開始終了時刻の差
+     */
     public String getDeltas(Calendar from, Calendar to) {
         // 日付フォーマット
         SimpleDateFormat format = new SimpleDateFormat("yyyy/M/d/H/m");
@@ -52,5 +58,17 @@ public class DateDeltas {
         }
 
         return String.valueOf(builder);
+    }
+
+    /**
+     * 現在の残りシャットダウン時間（単位:秒）から、想定起動時刻を返す。
+     * @param remainsInSec int型、現在の残りシャットダウン時間（単位:秒）
+     * @return Calendar型、想定起動時刻
+     */
+    public Calendar getEstimated(int remainsInSec) {
+        Calendar estimated = Calendar.getInstance();
+        estimated.add(Calendar.SECOND, remainsInSec);
+
+        return estimated;
     }
 }

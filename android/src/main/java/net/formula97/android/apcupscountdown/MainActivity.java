@@ -71,6 +71,9 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * EditTextつきのAlertDialogを生成し、EditText内の値を次の処理へ引き渡す。
+     */
     public void alertEditTextKeyboardShown() {
         // EditTextをつくり、数字属性にする
         final EditText editText = new EditText(MainActivity.this);
@@ -109,7 +112,12 @@ public class MainActivity extends Activity {
         dialog.show();
     }
 
+    /**
+     * 予想起動時刻の計算結果をAlertDialogで表示する。
+     * @param remainsInSec int型、前のEditTextで入力された、起動までの残り時間（単位:秒）
+     */
     public void showEstimated(int remainsInSec) {
+        // 予想起動時刻を計算し、端末のロケールに応じた形式のフォーマットに整形する
         DateDeltas deltas = new DateDeltas(this);
         Calendar estimated = deltas.getEstimated(remainsInSec);
         DateFormat dateFormat = android.text.format.DateFormat.getLongDateFormat(getApplicationContext());
@@ -121,6 +129,7 @@ public class MainActivity extends Activity {
                 + "  "
                 + timeFormat.format(estimated.getTime());
 
+        // AlertDialogを生成する
         new AlertDialog.Builder(this)
                 .setTitle(R.string.expected_wakeup)
                 .setMessage(message)
@@ -276,7 +285,7 @@ public class MainActivity extends Activity {
         }
 
         /**
-         *
+         * 修正済み起動時刻を、画面に反映する。
          */
         private void setResultTime() {
             DateDeltas deltas = new DateDeltas(getActivity());

@@ -29,6 +29,7 @@ import android.widget.TimePicker;
 
 import com.google.android.gms.ads.*;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -86,6 +87,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Log.d("PositiveButton", "Entered value of editText : " + editText.getText().toString());
+                        showEstimated(Integer.parseInt(String.valueOf(editText.getText())));
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -110,6 +112,24 @@ public class MainActivity extends Activity {
     public void showEstimated(int remainsInSec) {
         DateDeltas deltas = new DateDeltas(this);
         Calendar estimated = deltas.getEstimated(remainsInSec);
+        DateFormat dateFormat = android.text.format.DateFormat.getLongDateFormat(getApplicationContext());
+        DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(getApplicationContext());
+
+        String message = getString(R.string.server_wakeup_at)
+                + "    "
+                + dateFormat.format(estimated.getTime())
+                + "  "
+                + timeFormat.format(estimated.getTime());
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.expected_wakeup)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                }).show();
 
     }
     /**

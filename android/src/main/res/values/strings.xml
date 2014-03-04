@@ -18,5 +18,6 @@
     <string name="expected_wakeup">Expected wake up time</string>
     <string name="now_showing_lcd">How long is remaining time that is displayed on the LCD?</string>
     <string name="calculate">Calculate</string>
+    <string name="server_wakeup_at">Server will wake up at...\n</string>
 
 </resources>

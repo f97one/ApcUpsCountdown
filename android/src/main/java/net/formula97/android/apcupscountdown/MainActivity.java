@@ -12,7 +12,9 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -77,8 +79,26 @@ public class MainActivity extends Activity {
     public void alertEditTextKeyboardShown() {
         // EditTextをつくり、数字属性にする
         final EditText editText = new EditText(MainActivity.this);
-        editText.setRawInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        editText.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        editText.setLines(1);
         editText.setMaxLines(1);
+
+        // 受け付ける文字を数字のみ(＝正規表現で^[0-9]+$)に限定する
+        // 数字以外を受け取った場合は、空文字を返す
+        InputFilter inputFilter = new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                if (source.toString().matches("^[0-9]+$")) {
+                    return source;
+                } else {
+                    Log.d("InputFilter", "Received non-numeric strings : " + source.toString());
+                    return "";
+                }
+            }
+        };
+        // InputFilterをセットする
+        InputFilter[] filters = new InputFilter[] { inputFilter };
+        editText.setFilters(filters);
 
         final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.expected_wakeup)
